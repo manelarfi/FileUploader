@@ -14,7 +14,7 @@ const {
 
 router.get('/', getFiles)
 router.get('/:id', getFile)
-router.post('/upload', upload.single('file'), createFileInfo, addFile, )
-router.delete('/deleteFile/:id', deleteFileInfo,deleteFile )
+router.post('/upload', upload.single('file'), createFileInfo,addFile )
+router.delete('/deleteFile/:id', deleteFileInfo, deleteFile )
 
 module.exports = router;

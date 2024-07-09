@@ -9,7 +9,7 @@ const getFilesInfo = asyncHandler(async (req, res) => {
     if (!files) {
         return res.status(500);
     }
-    res.status(200).json(fileInfo);
+    res.status(200).json(files);
 });
 
 //@desc Get file info
@@ -34,8 +34,9 @@ const updateFileInfo = async (req, res) => {
         destination,
         filename,
         path,
-        size} = req.file;
-    const fileInfo = await File.findById(req.params.ID);
+        size} = req.body;
+
+    const fileInfo = await File.findById(req.params.id);
     if(!fileInfo) {
         return res.status(404).json({ message : "file not found"})
     }
