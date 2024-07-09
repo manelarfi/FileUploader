@@ -1,5 +1,5 @@
 const File = require("../models/fileModel");
-const asyncHandler = require('express-async-handler')
+const asyncHandler = require('express-async-handler');
 
 //@desc Get all files info
 //@route GET /api/getfilesinfo
@@ -7,7 +7,7 @@ const asyncHandler = require('express-async-handler')
 const getFilesInfo = asyncHandler(async (req, res) => {
     const files = await File.find();
     if (!files) {
-        return res.status(500);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
     res.status(200).json(files);
 });
@@ -15,31 +15,25 @@ const getFilesInfo = asyncHandler(async (req, res) => {
 //@desc Get file info
 //@route GET /api/getfileinfo/:id
 //@access Public
-const getFileInfo = async (req, res) => {
-    const fileInfo = await File.findById(req.params.id);
-    if(!fileInfo) {
-        return res.status(404).json({message : "file not found"})
+const getFileInfo = asyncHandler(async (req, res) => {
+    const fileInfo = await File.findById(req.params.id); 
+    if (!fileInfo) {
+        return res.status(404).json({ message: "File not found" });
     }
     res.status(200).json(fileInfo);
-};
+});
 
 //@desc Update file info
-//@route Update /api/updatefileinfo/:id
+//@route PUT /api/updatefileinfo/:id
 //@access Public
-const updateFileInfo = async (req, res) => {
-    const { fieldname,
-        originalname,
-        encoding,
-        mimetype,
-        destination,
-        filename,
-        path,
-        size} = req.body;
+const updateFileInfo = asyncHandler(async (req, res) => {
+    const { fieldname, originalname, encoding, mimetype, destination, filename, path, size } = req.body; 
 
-    const fileInfo = await File.findById(req.params.id);
-    if(!fileInfo) {
-        return res.status(404).json({ message : "file not found"})
+    const fileInfo = await File.findById(req.params.id); 
+    if (!fileInfo) {
+        return res.status(404).json({ message: "File not found" });
     }
+
     fileInfo.fieldname = fieldname || fileInfo.fieldname;
     fileInfo.originalname = originalname || fileInfo.originalname;
     fileInfo.encoding = encoding || fileInfo.encoding;
@@ -51,23 +45,15 @@ const updateFileInfo = async (req, res) => {
 
     await fileInfo.save();
     res.status(200).json(fileInfo);
-};
+});
 
 //@desc create new file
 //@route POST /uploadFileInfo
 //@access Public
-const createFileInfo = async (req, res) => {
-    const { fieldname,
-        originalname,
-        encoding,
-        mimetype,
-        destination,
-        filename,
-        path,
-        size} = req.file;
+const createFileInfo = asyncHandler(async (req, res) => {
+    const { fieldname, originalname, encoding, mimetype, destination, filename, path, size } = req.file;
 
-
-    const file = await File.create({ 
+    const file = await File.create({
         fieldname,
         originalname,
         encoding,
@@ -77,29 +63,29 @@ const createFileInfo = async (req, res) => {
         path,
         size
     });
+
     if (!file) {
-        return res.status(500).json({ message : "could not upload file"});
+        return res.status(500).json({ message: "Could not upload file" });
     }
-    res.status(200).json({ message : "file created successfully"});
-};
-
-
-//@desc delete a files
-//@route GET /api/deleteFileInfo/:id
-//@access Public
-const deleteFileInfo = asyncHandler(async (req, res) => {
-
-    const file = await File.findById(req.params.id);
-    if (!file) {
-        return res.status(500);
-    }
-    await file.deleteOne();
-    res.status(200).json({ message : "file deleted successfully"});
+    res.status(201).json({ message: "File created successfully", file });
 });
 
-module.exports = {createFileInfo,
+//@desc delete a file
+//@route DELETE /api/deletefileinfo/:id
+//@access Public
+const deleteFileInfo = asyncHandler(async (req, res) => {
+    const file = await File.findById(req.params.id); 
+    if (!file) {
+        return res.status(404).json({ message: "File not found" });
+    }
+    await file.deleteOne();
+    res.status(200).json({ message: "File deleted successfully" });
+});
+
+module.exports = {
+    createFileInfo,
     getFilesInfo,
     getFileInfo,
     updateFileInfo,
     deleteFileInfo
-}
+};
